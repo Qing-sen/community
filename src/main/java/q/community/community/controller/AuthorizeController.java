@@ -1,5 +1,7 @@
 package q.community.community.controller;
 
+import jdk.nashorn.internal.parser.Token;
+import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -11,7 +13,9 @@ import q.community.community.mapper.UserMapper;
 import q.community.community.model.User;
 import q.community.community.provider.GithubProvider;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
 @Controller
@@ -35,7 +39,7 @@ public class AuthorizeController {
     @GetMapping("/callback")
     public String callback(@RequestParam(name="code") String code,
                            @RequestParam(name="state") String state,
-                           HttpServletRequest request){
+                           HttpServletResponse response){
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
         accessTokenDTO.setClient_id(clientId);
         accessTokenDTO.setClient_secret(clientSecret);
@@ -44,23 +48,21 @@ public class AuthorizeController {
         accessTokenDTO.setState(state);
         String accessToken = githubProvider.getAccessToken(accessTokenDTO);
         GithubUser githubUser = githubProvider.getuser(accessToken);
-        System.out.println("**********************");
-       if(githubUser!=null){
-           System.out.println("----------------");
+        if(githubUser!=null && githubUser.getId()!=null){
             User user=new User();
-            user.setToken(UUID.randomUUID().toString());
+            String token=UUID.randomUUID().toString();
+            user.setToken(token);
             user.setName(githubUser.getName());
             user.setAccountId(String.valueOf(githubUser.getId()));
             user.setGmtCreate(System.currentTimeMillis());
             user.setGmtModified(user.getGmtCreate());
             userMapper.insert(user);
-           //如果user不为空，则说明已经登陆上去，需要显示用户的名字
-           //登录成功，写cookie和session
-           request.getSession().setAttribute("user",githubUser);
-           return "redirect:/";
+            response.addCookie(new Cookie("token", token));
+            System.out.println(" response.addCookie(new Cookie(\"token\", token));执行完毕");
+            return "redirect:/";
        }else{
-           //登陆失败，重新登录
-           return "redirect:/";
+            //登陆失败，重新登录
+            return "redirect:/";
        }
 
     }
