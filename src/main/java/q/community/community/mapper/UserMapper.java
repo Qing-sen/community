@@ -8,9 +8,12 @@ import q.community.community.model.User;
 
 @Mapper
 public interface UserMapper {
-    @Insert("insert into user (NAME,ACCOUNT_ID,TOKEN,gmt_create,gmt_modified)values (#{name},#{accountId},#{token},#{gmtCreate},#{gmtModified})")
+    @Insert("insert into user (NAME,ACCOUNT_ID,TOKEN,gmt_create,gmt_modified,avatar_url)values (#{name},#{accountId},#{token},#{gmtCreate},#{gmtModified},#{avatarUrl})")
     void insert(User user);
 
     @Select("select * from user where token = #{token}")
     User findByToken(@Param("token") String token);
+
+    @Select("select * from user where id = #{id}")
+    User findByID(@Param("id")Integer id);
 }
