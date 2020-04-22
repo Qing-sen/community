@@ -17,23 +17,9 @@ public class PaginationDTO {
     private List<Integer> pages = new ArrayList<>();
     private Integer totalPage;
 
-    public int setpagination(Integer totalCount, Integer page, Integer size) {
-        //总页数模除每页个数，如果能除尽，页数就等于商
-        //如果除不尽 页数就等于商+1
-        //求总页数
-        if(totalCount % size==0){
-            totalPage=totalCount / size;
-        }else{
-            totalPage=totalCount / size+1;
-        }
+    public int setpagination(Integer totalPage, Integer page) {
 
-        //当在地址栏中输入的页码为负数或者超过最大页码数时，进行进行处理
-        if(page<1){
-            page=1;
-        }
-        if(page>totalPage){
-            page=totalPage;
-        }
+        this.totalPage=totalPage;
 
         //给当前类中的page赋值
         this.page=page;
