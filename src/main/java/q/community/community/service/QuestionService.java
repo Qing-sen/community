@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import q.community.community.dto.PaginationDTO;
 import q.community.community.dto.QuestionDTO;
+import q.community.community.exception.CustomizeErrorCode;
+import q.community.community.exception.CustomizeException;
+import q.community.community.mapper.QuestionExtMapper;
 import q.community.community.mapper.QuestionMapper;
 import q.community.community.mapper.UserMapper;
 import q.community.community.model.Question;
@@ -19,6 +22,9 @@ import java.util.List;
 public class QuestionService {
     @Autowired
     private QuestionMapper questionMapper;
+
+    @Autowired
+    private QuestionExtMapper questionExtMapper;
 
     @Autowired
     private UserMapper userMapper;
@@ -112,6 +118,9 @@ public class QuestionService {
 
     public QuestionDTO getById(Integer id   ) {
         Question question = questionMapper.selectByPrimaryKey(id);
+        if(question==null){
+            throw  new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+        }
         QuestionDTO questionDTO = new QuestionDTO();
         BeanUtils.copyProperties(question, questionDTO);
         User user = userMapper.selectByPrimaryKey(question.getCreator());
@@ -135,7 +144,17 @@ public class QuestionService {
             QuestionExample example =new QuestionExample();
             example.createCriteria()
                     .andIdEqualTo(question.getId()) ;
-            questionMapper.updateByExampleSelective(uodatequestion, example);
+            int updated = questionMapper.updateByExampleSelective(uodatequestion, example);
+            if(updated != 1){
+                throw  new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+            }
         }
+    }
+
+    public void incView(Integer id) {
+        Question question = new Question();
+        question.setId(id);
+        question.setViewCount(1);
+        questionExtMapper.incView(question);
     }
 }

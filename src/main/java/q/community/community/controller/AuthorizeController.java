@@ -56,11 +56,10 @@ public class AuthorizeController {
             user.setAvatarUrl(githubUser.getAvatar_url());
             userService.createOrUpdate(user);
             response.addCookie(new Cookie("token", token));
-            return "redirect:/";
         }else{
             //登陆失败，重新登录
-            return "redirect:/";
         }
+        return "redirect:/";
     }
     @GetMapping("/logout")
     public String logout(HttpServletRequest request,

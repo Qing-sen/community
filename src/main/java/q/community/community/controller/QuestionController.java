@@ -6,7 +6,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import q.community.community.dto.QuestionDTO;
-import q.community.community.mapper.QuestionMapper;
 import q.community.community.service.QuestionService;
 
 @Controller
@@ -20,6 +19,8 @@ public class QuestionController {
                            Model model){
 
         QuestionDTO questionDTO = questionService.getById(id);
+        //累加阅读数
+        questionService.incView(id);
         model.addAttribute("question",questionDTO);
         return "question";
     }
