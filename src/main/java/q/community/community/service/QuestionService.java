@@ -1,6 +1,5 @@
 package q.community.community.service;
 
-import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +66,7 @@ public class QuestionService {
         return paginationDTO;
     }
 
-    public PaginationDTO list(Integer userId, Integer page, Integer size) {
+    public PaginationDTO list(Long userId, Integer page, Integer size) {
 
         PaginationDTO paginationDTO = new PaginationDTO();
         Integer totalpage;
@@ -116,7 +115,7 @@ public class QuestionService {
         return paginationDTO;
     }
 
-    public QuestionDTO getById(Integer id   ) {
+    public QuestionDTO getById(long id ) {
         Question question = questionMapper.selectByPrimaryKey(id);
         if(question==null){
             throw  new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
@@ -133,6 +132,9 @@ public class QuestionService {
              //创建
             question.setGmtCreate(System.currentTimeMillis());
             question.setGmtModified(question.getGmtCreate());
+            System.out.println(question.getViewCount());
+            System.out.println(question.getLikeCount());
+            System.out.println(question.getCommentCount());
             questionMapper.insert(question);
         }else{
             //更新
@@ -151,7 +153,7 @@ public class QuestionService {
         }
     }
 
-    public void incView(Integer id) {
+    public void incView(Long id) {
         Question question = new Question();
         question.setId(id);
         question.setViewCount(1);
